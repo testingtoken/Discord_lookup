@@ -3,61 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SENTRY // INSIGHT</title>
+    <title>SENTRY INSIGHT</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { background: #050609; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; }
-        .premium-card { background: rgba(15, 17, 26, 0.7); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 32px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
-        .btn-grad { background: linear-gradient(135deg, #6366f1, #8b5cf6); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .btn-grad:hover { transform: scale(1.05); filter: brightness(1.2); }
-        .avatar-ring { border: 6px solid #050609; box-shadow: 0 0 20px rgba(0,0,0,0.4); }
-        .banner-overlay { background: linear-gradient(to bottom, transparent, rgba(5,6,9,0.8)); }
+        body { background: #030407; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .card-blur { background: rgba(13, 15, 23, 0.8); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .input-glow:focus { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); border-color: #6366f1; }
+        .btn-premium { background: linear-gradient(135deg, #6366f1, #a855f7); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-premium:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4); }
+        .banner-img { background-position: center; background-size: cover; position: relative; }
+        .banner-img::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #030407); }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="min-h-screen flex items-center justify-center p-6 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-900/50 via-black to-black">
 
     <div class="w-full max-w-md space-y-6">
-        <div class="premium-card p-3 flex gap-2 animate__animated animate__fadeInDown">
-            <input type="text" id="targetId" placeholder="Entrez l'ID unique..." class="bg-transparent flex-1 px-4 outline-none font-semibold text-indigo-100">
-            <button onclick="lookup()" class="btn-grad px-6 py-3 rounded-2xl font-bold text-xs uppercase tracking-widest">Scanner</button>
+        <div class="card-blur p-2 rounded-[24px] flex gap-2 animate__animated animate__fadeInDown">
+            <input type="text" id="targetId" placeholder="ID Discord..." class="bg-transparent flex-1 px-5 outline-none font-medium text-white input-glow rounded-xl transition-all">
+            <button onclick="lookup()" class="btn-premium px-8 py-4 rounded-[18px] font-extrabold text-[10px] uppercase tracking-[0.2em]">Analyser</button>
         </div>
 
-        <div id="loader" class="hidden text-center py-10 animate-pulse text-indigo-400 font-bold uppercase tracking-widest text-[10px]">Initialisation du lien neural...</div>
+        <div id="errorBox" class="hidden animate__animated animate__headShake bg-red-500/10 border border-red-500/20 p-4 rounded-2xl text-red-400 text-xs text-center font-bold uppercase tracking-wider"></div>
 
-        <div id="card" class="hidden animate__animated animate__zoomIn">
-            <div class="premium-card overflow-hidden">
-                <div id="bannerBox" class="h-40 w-full relative bg-indigo-600 bg-cover bg-center">
-                    <div class="absolute inset-0 banner-overlay"></div>
-                </div>
+        <div id="loader" class="hidden text-center py-12 animate__animated animate__fadeIn">
+            <div class="inline-block w-10 h-10 border-[3px] border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-[10px] mt-4 text-slate-500 uppercase font-black tracking-[0.3em]">Synchro Database...</p>
+        </div>
+
+        <div id="card" class="hidden animate__animated animate__fadeInUp">
+            <div class="card-blur rounded-[32px] overflow-hidden shadow-2xl">
+                <div id="banner" class="h-36 w-full banner-img"></div>
                 
                 <div class="px-8 pb-8 flex flex-col items-center -mt-16 relative">
-                    <img id="avatar" src="" class="w-32 h-32 rounded-[2.5rem] avatar-ring bg-slate-800">
+                    <img id="avatar" src="" class="w-32 h-32 rounded-[35%] border-[6px] border-[#030407] shadow-2xl bg-slate-900">
                     
                     <div class="text-center mt-6">
-                        <h2 id="name" class="text-3xl font-extrabold tracking-tight italic">---</h2>
-                        <p id="tag" class="text-indigo-400 font-bold text-sm">@---</p>
-                    </div>
-
-                    <div class="w-full grid grid-cols-2 gap-3 mt-8">
-                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                            <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Ancienneté</p>
-                            <p id="date" class="text-sm font-semibold text-slate-200">---</p>
-                        </div>
-                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                            <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">ID Stable</p>
-                            <p id="resId" class="text-[10px] font-mono text-indigo-300 truncate">---</p>
-                        </div>
+                        <h2 id="name" class="text-3xl font-black tracking-tight">---</h2>
+                        <p id="tag" class="text-indigo-400 font-bold text-sm opacity-80">@---</p>
                     </div>
 
                     <div class="w-full space-y-3 mt-8">
-                        <button onclick="download('avatar')" class="w-full py-4 bg-white text-black rounded-2xl font-black text-xs flex items-center justify-center gap-2 hover:bg-indigo-50 transition-all uppercase">
-                            Télécharger Avatar
-                        </button>
-                        <button id="dlBanner" onclick="download('banner')" class="w-full py-4 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-2xl font-black text-xs flex items-center justify-center gap-2 hover:bg-indigo-500/20 transition-all uppercase">
-                            Télécharger Bannière
-                        </button>
+                        <div class="bg-white/[0.03] p-4 rounded-2xl border border-white/5 flex justify-between items-center">
+                            <span class="text-[10px] text-slate-500 font-black uppercase">Création</span>
+                            <span id="date" class="text-xs font-bold text-slate-200">---</span>
+                        </div>
+                        <div class="bg-white/[0.03] p-4 rounded-2xl border border-white/5 flex justify-between items-center">
+                            <span class="text-[10px] text-slate-500 font-black uppercase">ID Stable</span>
+                            <span id="resId" class="text-[10px] font-mono text-indigo-300">---</span>
+                        </div>
+                    </div>
+
+                    <div class="w-full grid grid-cols-1 gap-3 mt-8">
+                        <button onclick="downloadAsset('avatar')" class="w-full py-4 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-all">Télécharger Avatar</button>
+                        <button id="btnBanner" onclick="downloadAsset('banner')" class="w-full py-4 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-500/20 transition-all">Télécharger Bannière</button>
                     </div>
                 </div>
             </div>
@@ -65,67 +65,66 @@
     </div>
 
     <script>
-        let currentData = null;
+        let userData = null;
 
         async function lookup() {
             const id = document.getElementById('targetId').value.trim();
+            const errBox = document.getElementById('errorBox');
+            const card = document.getElementById('card');
+            const loader = document.getElementById('loader');
+
+            // Reset
+            errBox.classList.add('hidden');
+            card.classList.add('hidden');
+
             if(!id) return;
-            
-            document.getElementById('card').classList.add('hidden');
-            document.getElementById('loader').classList.remove('hidden');
+
+            loader.classList.remove('hidden');
 
             try {
                 const response = await fetch(`/api/user/${id}`);
                 const data = await response.json();
 
                 if(data.success) {
-                    currentData = data;
+                    userData = data;
                     document.getElementById('name').innerText = data.globalName;
                     document.getElementById('tag').innerText = `@${data.username}`;
                     document.getElementById('resId').innerText = data.id;
                     document.getElementById('date').innerText = data.createdAt;
-                    
-                    // Gestion Avatar
                     document.getElementById('avatar').src = data.avatar;
+
+                    const banner = document.getElementById('banner');
+                    const btnBanner = document.getElementById('btnBanner');
                     
-                    // Gestion Bannière
-                    const bannerBox = document.getElementById('bannerBox');
                     if(data.banner) {
-                        bannerBox.style.backgroundImage = `url(${data.banner})`;
-                        document.getElementById('dlBanner').classList.remove('opacity-50', 'pointer-events-none');
+                        banner.style.backgroundImage = `url(${data.banner})`;
+                        btnBanner.style.display = "block";
                     } else {
-                        bannerBox.style.backgroundImage = 'none';
-                        bannerBox.style.backgroundColor = data.bannerColor;
-                        document.getElementById('dlBanner').classList.add('opacity-50', 'pointer-events-none');
+                        banner.style.backgroundImage = 'none';
+                        banner.style.backgroundColor = data.bannerColor;
+                        btnBanner.style.display = "none";
                     }
 
-                    // On attend que l'image soit chargée pour afficher (évite le bug du 2ème clic)
+                    // On attend que l'avatar charge pour éviter les flashs
                     document.getElementById('avatar').onload = () => {
-                        document.getElementById('loader').classList.add('hidden');
-                        document.getElementById('card').classList.remove('hidden');
+                        loader.classList.add('hidden');
+                        card.classList.remove('hidden');
                     };
                 } else {
-                    alert("Utilisateur introuvable");
-                    document.getElementById('loader').classList.add('hidden');
+                    throw new Error(data.error);
                 }
             } catch (e) {
-                alert("Erreur Serveur");
-                document.getElementById('loader').classList.add('hidden');
+                loader.classList.add('hidden');
+                errBox.innerText = "⚠️ " + e.message;
+                errBox.classList.remove('hidden');
             }
         }
 
-        function download(type) {
-            if(!currentData) return;
-            const url = type === 'avatar' ? currentData.avatar : currentData.banner;
+        function downloadAsset(type) {
+            if(!userData) return;
+            const url = type === 'avatar' ? userData.avatar : userData.banner;
             if(!url) return;
-            
-            const link = document.createElement('a');
-            link.href = url;
-            link.target = '_blank'; // Sur mobile, ça ouvre l'image pour l'enregistrer
-            link.download = `${type}-${currentData.id}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            window.open(url, '_blank');
         }
     </script>
 </body>
