@@ -13,90 +13,48 @@
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-6">
-
     <div class="w-full max-w-md space-y-8">
         <div class="text-center">
             <h1 class="text-3xl font-bold tracking-tighter uppercase italic">Sentry_Lookup</h1>
-            <p class="text-slate-500 text-xs mt-2 uppercase tracking-widest">Accès aux serveurs Discord en temps réel</p>
+            <p class="text-slate-500 text-xs mt-2 uppercase tracking-widest">Accès en temps réel</p>
         </div>
-
         <div class="glass p-2 rounded-2xl flex gap-2">
-            <input type="text" id="targetId" placeholder="ID UTILISATEUR..." 
-                class="bg-transparent flex-1 p-3 outline-none text-sm font-mono">
-            <button onclick="lookup()" class="bg-cyan-600 hover:bg-cyan-500 text-black font-bold px-6 py-2 rounded-xl text-xs uppercase transition-all">
-                Scan
-            </button>
+            <input type="text" id="targetId" placeholder="ID UTILISATEUR..." class="bg-transparent flex-1 p-3 outline-none text-sm font-mono">
+            <button onclick="lookup()" class="bg-cyan-600 hover:bg-cyan-500 text-black font-bold px-6 py-2 rounded-xl text-xs uppercase transition-all">Scan</button>
         </div>
-
-        <div id="loader" class="hidden text-center text-cyan-500 text-xs animate-pulse">RECHERCHE DANS LA BASE...</div>
-
-        <div id="card" class="hidden glass rounded-3xl overflow-hidden animate-in fade-in duration-500">
+        <div id="loader" class="hidden text-center text-cyan-500 text-xs animate-pulse">RECHERCHE...</div>
+        <div id="card" class="hidden glass rounded-3xl overflow-hidden">
             <div class="h-20 bg-gradient-to-r from-cyan-950 to-blue-950"></div>
             <div class="p-6 pt-0 -mt-10 flex flex-col items-center">
                 <img id="avatar" src="" class="w-24 h-24 rounded-2xl border-4 border-[#02040a] bg-slate-900 shadow-2xl">
                 <h2 id="name" class="text-xl font-bold mt-4">---</h2>
                 <p id="tag" class="text-slate-500 text-sm">@---</p>
-                
                 <div class="w-full mt-6 space-y-3">
                     <div class="bg-white/5 p-3 rounded-xl border border-white/5">
-                        <span class="text-[10px] text-slate-500 block uppercase">Identifiant Unique</span>
+                        <span class="text-[10px] text-slate-500 block uppercase">ID</span>
                         <span id="resId" class="text-xs font-mono text-cyan-400">---</span>
-                    </div>
-                </div>
-
-                <div class="w-full mt-6 pt-6 border-t border-white/10">
-                    <p class="text-[10px] text-slate-500 mb-4 uppercase">Notes de terrain</p>
-                    <div id="logs" class="space-y-2 mb-4"></div>
-                    <div class="flex gap-2">
-                        <input id="logIn" type="text" placeholder="Note..." class="bg-white/5 border border-white/10 flex-1 rounded-lg p-2 text-xs outline-none">
-                        <button onclick="addLog()" class="bg-white/10 p-2 rounded-lg text-xs">OK</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     <script>
         async function lookup() {
             const id = document.getElementById('targetId').value;
-            const card = document.getElementById('card');
-            const loader = document.getElementById('loader');
-            
             if(!id) return;
-            
-            loader.classList.remove('hidden');
-            card.classList.add('hidden');
-
+            document.getElementById('loader').classList.remove('hidden');
             try {
-                // REMPLACE L'URL CI-DESSOUS PAR TON LIEN RENDER
                 const response = await fetch(`https://discord-lookup-oqhd.onrender.com/api/user/${id}`);
                 const data = await response.json();
-
                 if(data.success) {
                     document.getElementById('name').innerText = data.globalName;
                     document.getElementById('tag').innerText = `@${data.username}`;
                     document.getElementById('resId').innerText = data.id;
                     document.getElementById('avatar').src = data.avatar;
-                    card.classList.remove('hidden');
-                } else {
-                    alert("Cible introuvable.");
-                }
-            } catch (e) {
-                alert("Erreur serveur. Vérifie que Render est 'Live'.");
-            } finally {
-                loader.classList.add('hidden');
-            }
-        }
-
-        function addLog() {
-            const val = document.getElementById('logIn').value;
-            if(!val) return;
-            const logs = document.getElementById('logs');
-            const d = document.createElement('div');
-            d.className = "neon-border bg-white/5 p-2 text-[11px] text-slate-300";
-            d.innerText = val;
-            logs.prepend(d);
-            document.getElementById('logIn').value = "";
+                    document.getElementById('card').classList.remove('hidden');
+                } else { alert("Introuvable"); }
+            } catch (e) { alert("Erreur serveur"); }
+            document.getElementById('loader').classList.add('hidden');
         }
     </script>
 </body>
