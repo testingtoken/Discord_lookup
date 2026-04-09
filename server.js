@@ -15,9 +15,10 @@ app.get('/', (req, res) => {
 
 app.get('/api/user/:id', async (req, res) => {
     const id = req.params.id;
-    // Vérification : l'ID doit être uniquement des chiffres et faire entre 17 et 20 caractères
+    
+    // Sécurité : Vérifie si l'ID est valide (uniquement chiffres, bonne longueur)
     if (!/^\d+$/.test(id) || id.length < 17 || id.length > 20) {
-        return res.json({ success: false, error: "Format d'ID invalide." });
+        return res.json({ success: false, error: "Format d'ID invalide (chiffres uniquement)." });
     }
 
     try {
@@ -32,10 +33,12 @@ app.get('/api/user/:id', async (req, res) => {
             tag: user.discriminator !== '0' ? `#${user.discriminator}` : ''
         });
     } catch (e) { 
-        res.json({ success: false, error: "Utilisateur introuvable." }); 
+        res.json({ success: false, error: "Cet utilisateur n'existe pas." }); 
     }
 });
 
-app.listen(process.env.PORT || 3000, () => {
-    client.login(process.env.DISCORD_TOKEN).catch(() => console.log("Erreur Token"));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`🚀 Serveur actif sur le port ${PORT}`);
+    client.login(process.env.DISCORD_TOKEN).catch(() => console.log("Erreur : Token invalide"));
 });
