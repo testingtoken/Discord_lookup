@@ -5,35 +5,29 @@ const path = require('path');
 
 const app = express();
 app.use(cors());
-
-// Sert le fichier HTML quand on arrive sur le lien
 app.use(express.static(path.join(__dirname)));
+
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-const TOKEN = process.env.DISCORD_TOKEN;
-
-client.once('ready', () => {
-    console.log(`✅ Bot en ligne : ${client.user.tag}`);
-});
-
 app.get('/api/user/:id', async (req, res) => {
     try {
-        const user = await client.users.fetch(req.params.id);
+        const user = await client.users.fetch(req.params.id, { force: true });
         res.json({
             success: true,
             username: user.username,
             globalName: user.globalName || user.username,
-            avatar: user.displayAvatarURL({ dynamic: true, size: 512 }),
-            id: user.id
+            avatar: user.displayAvatarURL({ dynamic: true, size: 1024 }),
+            bannerColor: user.hexAccentColor || '#5865F2',
+            createdAt: user.createdAt.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }),
+            tag: user.discriminator !== '0' ? `#${user.discriminator}` : ''
         });
-    } catch (error) {
-        res.status(404).json({ success: false });
-    }
+    } catch (e) { res.json({ success: false }); }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Serveur actif sur le port ${PORT}`));
-client.login(TOKEN);
+app.listen(process.env.PORT || 3000, () => {
+    client.login(process.env.DISCORD_TOKEN).catch(() => console.log("Token Error"));
+});
