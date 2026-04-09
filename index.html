@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENTRY // Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #050508;
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glow-cyan { box-shadow: 0 0 30px rgba(6, 182, 212, 0.15); }
+        .input-cyber {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .input-cyber:focus {
+            border-color: #06b6d4;
+            background: rgba(6, 182, 212, 0.05);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-start py-12 px-4">
+
+    <div class="w-full max-w-lg mb-12 text-center">
+        <h1 class="text-xs uppercase tracking-[0.5em] text-cyan-500 font-bold mb-2 animate-pulse">Neural Link Active</h1>
+        <h2 class="text-4xl font-extrabold tracking-tight">SENTRY<span class="text-cyan-500">.</span>OS</h2>
+    </div>
+
+    <div class="w-full max-w-lg relative group mb-12">
+        <input type="text" id="targetId" placeholder="Entrez un ID Discord..." 
+            class="input-cyber w-full p-6 rounded-3xl outline-none text-lg font-light tracking-wide">
+        <button onclick="searchUser()" class="absolute right-3 top-3 bottom-3 bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-8 rounded-2xl transition-all active:scale-95 shadow-lg shadow-cyan-500/20">
+            SCAN
+        </button>
+    </div>
+
+    <div id="resultCard" class="hidden w-full max-w-lg space-y-6">
+        <div class="glass rounded-[2.5rem] overflow-hidden glow-cyan">
+            <div id="banner" class="h-32 bg-gradient-to-r from-cyan-900 to-blue-900 opacity-50"></div>
+            
+            <div class="px-8 pb-10">
+                <div class="flex items-end -mt-14 gap-6 mb-8">
+                    <img id="avatar" src="" class="w-32 h-32 rounded-[2rem] border-[8px] border-[#050508] shadow-2xl bg-gray-900">
+                    <div class="mb-2">
+                        <h3 id="username" class="text-3xl font-bold tracking-tighter">---</h3>
+                        <p id="globalName" class="text-cyan-500/80 font-medium">@---</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 text-sm font-light">
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/5">
+                        <p class="text-gray-500 text-[10px] uppercase mb-1">Status</p>
+                        <p class="text-emerald-400 font-bold uppercase tracking-widest text-[10px]">Identifié</p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-white/5 border border-white/5">
+                        <p class="text-gray-500 text-[10px] uppercase mb-1">Database ID</p>
+                        <p id="displayId" class="font-mono text-xs">---</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-8 border-t border-white/5">
+                    <h4 class="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-6 font-bold">Rapports d'archive</h4>
+                    <div id="logs" class="space-y-4 mb-6">
+                        <p class="text-gray-600 text-xs italic">Aucun rapport disponible.</p>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <input id="logInput" type="text" placeholder="Ajouter une note de terrain..." 
+                            class="bg-white/5 border border-white/5 flex-1 rounded-xl p-3 text-sm outline-none focus:border-cyan-500/50 transition-all">
+                        <button onclick="addLog()" class="bg-white/10 hover:bg-white/20 px-4 rounded-xl text-xs font-bold uppercase">Log</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function searchUser() {
+            const id = document.getElementById('targetId').value;
+            if(!id) return;
+
+            // Change cet URL par celui de ton serveur Render plus tard !
+            const apiURL = `http://localhost:3000/api/user/${id}`;
+
+            try {
+                const res = await fetch(apiURL);
+                const data = await res.json();
+
+                if(data.success) {
+                    document.getElementById('resultCard').classList.remove('hidden');
+                    document.getElementById('username').innerText = data.username;
+                    document.getElementById('globalName').innerText = `@${data.username}`;
+                    document.getElementById('displayId').innerText = data.id;
+                    document.getElementById('avatar').src = data.avatar;
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                } else {
+                    alert("Cible introuvable.");
+                }
+            } catch (e) {
+                alert("Erreur de connexion au serveur.");
+            }
+        }
+
+        function addLog() {
+            const input = document.getElementById('logInput');
+            if(!input.value) return;
+            const logs = document.getElementById('logs');
+            if(logs.querySelector('p')) logs.innerHTML = '';
+            
+            const div = document.createElement('div');
+            div.className = "p-4 rounded-2xl bg-cyan-500/5 border border-cyan-500/10 text-xs text-cyan-100 animate-in slide-in-from-left-2";
+            div.innerHTML = `<span class="text-cyan-500 font-bold tracking-tighter mr-2">LOG_${Math.floor(Math.random()*999)}:</span> ${input.value}`;
+            logs.prepend(div);
+            input.value = '';
+        }
+    </script>
+</body>
+</html>
