@@ -3,37 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SENTRY // LOOKUP</title>
+    <title>SENTRY // OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&display=swap');
-        body { background: #02040a; color: #fff; font-family: 'Space Grotesk', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Share+Tech+Mono&display=swap');
+        body { background: #050505; color: #fff; font-family: 'Share Tech Mono', monospace; overflow: hidden; }
+        .grid-bg { background-image: linear-gradient(rgba(0, 255, 242, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 242, 0.05) 1px, transparent 1px); background-size: 30px 30px; }
+        .neon-border { box-shadow: 0 0 15px rgba(0, 255, 242, 0.4), inset 0 0 15px rgba(0, 255, 242, 0.2); border: 1px solid rgba(0, 255, 242, 0.5); }
+        .scanline { width: 100%; height: 2px; background: rgba(0, 255, 242, 0.3); position: absolute; animation: scan 3s linear infinite; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        .glow-text { text-shadow: 0 0 10px rgba(0, 255, 242, 0.8); }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-6">
-    <div class="w-full max-w-md space-y-8">
-        <div class="text-center">
-            <h1 class="text-3xl font-bold tracking-tighter uppercase italic text-cyan-500">Sentry_Lookup</h1>
-            <p class="text-slate-500 text-[10px] uppercase tracking-[0.2em]">Accès Base de Données Discord</p>
+<body class="min-h-screen flex items-center justify-center grid-bg">
+    <div class="scanline"></div>
+
+    <div class="w-full max-w-lg p-6 z-10">
+        <div class="mb-8 text-center animate__animated animate__fadeInDown">
+            <h1 class="text-4xl font-bold glow-text tracking-widest uppercase mb-2" style="font-family: 'Syncopate';">Sentry.v3</h1>
+            <div class="h-1 w-24 bg-cyan-500 mx-auto"></div>
         </div>
 
-        <div class="glass p-2 rounded-2xl flex gap-2">
-            <input type="text" id="targetId" placeholder="ID UTILISATEUR..." class="bg-transparent flex-1 p-3 outline-none text-sm font-mono text-cyan-100">
-            <button onclick="lookup()" class="bg-cyan-600 hover:bg-cyan-500 text-black font-bold px-6 py-2 rounded-xl text-xs uppercase transition-all">Scan</button>
+        <div class="neon-border bg-black/80 p-1 rounded-lg mb-10 transition-all hover:scale-105">
+            <div class="flex p-2">
+                <input type="text" id="targetId" placeholder="ENTER_TARGET_ID..." class="bg-transparent flex-1 p-4 outline-none text-cyan-400 placeholder-cyan-900">
+                <button onclick="lookup()" class="bg-cyan-500 hover:bg-white text-black font-black px-8 transition-colors duration-500">SCAN</button>
+            </div>
         </div>
 
-        <div id="loader" class="hidden text-center text-cyan-500 text-[10px] animate-pulse">CRYPTOGRAPHIE EN COURS...</div>
+        <div id="loader" class="hidden text-center animate-pulse text-cyan-500">
+            [ RUNNING SYSTEM_SCAN_CORE... ]
+        </div>
 
-        <div id="card" class="hidden glass rounded-3xl overflow-hidden border-cyan-900/30 shadow-[0_0_50px_-12px_rgba(6,182,212,0.2)]">
-            <div class="h-20 bg-gradient-to-r from-cyan-950 to-blue-950"></div>
-            <div class="p-6 pt-0 -mt-10 flex flex-col items-center">
-                <img id="avatar" src="" class="w-24 h-24 rounded-2xl border-4 border-[#02040a] bg-slate-900">
-                <h2 id="name" class="text-xl font-bold mt-4 tracking-tight">---</h2>
-                <p id="tag" class="text-slate-500 text-sm">@---</p>
-                <div class="w-full mt-6 bg-white/5 p-3 rounded-xl border border-white/5">
-                    <span class="text-[10px] text-slate-500 block uppercase">Identifiant</span>
-                    <span id="resId" class="text-xs font-mono text-cyan-400">---</span>
+        <div id="card" class="hidden animate__animated animate__zoomIn">
+            <div class="neon-border bg-black/90 rounded-xl overflow-hidden relative">
+                <div class="h-32 bg-gradient-to-r from-cyan-900/50 to-purple-900/50 flex items-end justify-center pb-4">
+                    <div class="absolute top-2 right-4 text-[10px] text-cyan-500">SECURE_CONNECTION: TRUE</div>
+                </div>
+                
+                <div class="p-8 -mt-16 flex flex-col items-center">
+                    <img id="avatar" src="" class="w-32 h-32 rounded-full border-4 border-cyan-500 shadow-[0_0_30px_rgba(0,255,242,0.5)]">
+                    <h2 id="name" class="text-3xl font-bold mt-6 glow-text tracking-tighter">---</h2>
+                    <p id="tag" class="text-cyan-600 mb-8 tracking-[0.3em]">@USER_DATA</p>
+                    
+                    <div class="w-full grid grid-cols-1 gap-4 text-left">
+                        <div class="bg-white/5 p-4 rounded border-l-4 border-cyan-500">
+                            <span class="text-[10px] text-cyan-800 uppercase block">User Serial / ID</span>
+                            <span id="resId" class="text-lg text-cyan-200">---</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -43,19 +62,35 @@
         async function lookup() {
             const id = document.getElementById('targetId').value;
             if(!id) return;
-            document.getElementById('loader').classList.remove('hidden');
+            
+            const card = document.getElementById('card');
+            const loader = document.getElementById('loader');
+            
+            card.classList.add('hidden');
+            loader.classList.remove('hidden');
+
             try {
                 const response = await fetch(`/api/user/${id}`);
                 const data = await response.json();
+
                 if(data.success) {
                     document.getElementById('name').innerText = data.globalName;
-                    document.getElementById('tag').innerText = `@${data.username}`;
+                    document.getElementById('tag').innerText = `@${data.username.toUpperCase()}`;
                     document.getElementById('resId').innerText = data.id;
                     document.getElementById('avatar').src = data.avatar;
-                    document.getElementById('card').classList.remove('hidden');
-                } else { alert("Utilisateur inconnu."); }
-            } catch (e) { alert("Erreur de liaison."); }
-            document.getElementById('loader').classList.add('hidden');
+                    
+                    setTimeout(() => {
+                        loader.classList.add('hidden');
+                        card.classList.remove('hidden');
+                    }, 1200); // Petit délai pour faire "pro"
+                } else {
+                    alert("ID_NOT_FOUND");
+                    loader.classList.add('hidden');
+                }
+            } catch (e) {
+                alert("SYSTEM_ERROR");
+                loader.classList.add('hidden');
+            }
         }
     </script>
 </body>
