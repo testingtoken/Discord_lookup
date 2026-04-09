@@ -14,8 +14,14 @@ app.get('/', (req, res) => {
 });
 
 app.get('/api/user/:id', async (req, res) => {
+    const id = req.params.id;
+    // Vérification : l'ID doit être uniquement des chiffres et faire entre 17 et 20 caractères
+    if (!/^\d+$/.test(id) || id.length < 17 || id.length > 20) {
+        return res.json({ success: false, error: "Format d'ID invalide." });
+    }
+
     try {
-        const user = await client.users.fetch(req.params.id, { force: true });
+        const user = await client.users.fetch(id, { force: true });
         res.json({
             success: true,
             username: user.username,
@@ -25,9 +31,11 @@ app.get('/api/user/:id', async (req, res) => {
             createdAt: user.createdAt.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }),
             tag: user.discriminator !== '0' ? `#${user.discriminator}` : ''
         });
-    } catch (e) { res.json({ success: false }); }
+    } catch (e) { 
+        res.json({ success: false, error: "Utilisateur introuvable." }); 
+    }
 });
 
 app.listen(process.env.PORT || 3000, () => {
-    client.login(process.env.DISCORD_TOKEN).catch(() => console.log("Token Error"));
+    client.login(process.env.DISCORD_TOKEN).catch(() => console.log("Erreur Token"));
 });
