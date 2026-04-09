@@ -3,15 +3,18 @@ const { Client, GatewayIntentBits } = require('discord.js');
 const cors = require('cors');
 
 const app = express();
-app.use(cors()); // Autorise ton site web à parler à cette API
+app.use(cors());
 
 const client = new Client({ 
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] 
+    intents: [GatewayIntentBits.Guilds] 
 });
 
-const TOKEN = "MTM2MTc0NTc1MDQyOTUzMjM2MQ.GaxXHm.J80mzk8pBL-odq01w5A2wH0YOUdJ_cgrmms-Pk"; // Remplace par ton vrai token
+// Récupère le token via les variables d'environnement de Render
+const TOKEN = process.env.DISCORD_TOKEN;
 
-client.once('ready', () => console.log(`✅ Bot connecté : ${client.user.tag}`));
+client.once('ready', () => {
+    console.log(`✅ Bot connecté en tant que : ${client.user.tag}`);
+});
 
 app.get('/api/user/:id', async (req, res) => {
     try {
@@ -19,17 +22,20 @@ app.get('/api/user/:id', async (req, res) => {
         res.json({
             success: true,
             username: user.username,
-            globalName: user.globalName,
-            id: user.id,
+            globalName: user.globalName || user.username,
             avatar: user.displayAvatarURL({ dynamic: true, size: 512 }),
-            banner: user.accentColor, // Couleur de profil
-            createdAt: user.createdAt
+            id: user.id
         });
     } catch (error) {
+        console.error(error);
         res.status(404).json({ success: false, message: "Utilisateur introuvable" });
     }
 });
 
+// Route de test pour voir si le serveur vit
+app.get('/', (req, res) => res.send("Système SENTRY en ligne."));
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 API active sur le port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Serveur actif sur le port ${PORT}`));
+
 client.login(TOKEN);
