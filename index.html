@@ -3,128 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SENTRY INSIGHT</title>
+    <title>SENTRY INSIGHT ELITE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { background: #030407; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; }
-        .card-blur { background: rgba(13, 15, 23, 0.8); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .input-glow:focus { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); border-color: #6366f1; }
-        .btn-premium { background: linear-gradient(135deg, #6366f1, #a855f7); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .btn-premium:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4); }
-        .banner-img { background-position: center; background-size: cover; position: relative; }
-        .banner-img::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #030407); }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        :root { --main: #6366f1; --bg: #030407; }
+        body { background: var(--bg); color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
+        .main-gradient { background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent), radial-gradient(circle at bottom left, rgba(168, 85, 247, 0.1), transparent); }
+        .glass { background: rgba(13, 15, 23, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .btn-prime { background: linear-gradient(135deg, #6366f1, #a855f7); transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+        .btn-prime:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 15px 30px -10px rgba(99, 102, 241, 0.5); }
+        .avatar-frame { border: 6px solid var(--bg); box-shadow: 0 10px 40px rgba(0,0,0,0.5); transition: all 0.5s ease; }
+        .banner-glow { position: relative; overflow: hidden; }
+        .banner-glow::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, var(--bg)); }
+        .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 16px; }
+        .shimmer { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); background-size: 200% 100%; animation: loading 2s infinite; }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-900/50 via-black to-black">
-
-    <div class="w-full max-w-md space-y-6">
-        <div class="card-blur p-2 rounded-[24px] flex gap-2 animate__animated animate__fadeInDown">
-            <input type="text" id="targetId" placeholder="ID Discord..." class="bg-transparent flex-1 px-5 outline-none font-medium text-white input-glow rounded-xl transition-all">
-            <button onclick="lookup()" class="btn-premium px-8 py-4 rounded-[18px] font-extrabold text-[10px] uppercase tracking-[0.2em]">Analyser</button>
+<body class="min-h-screen flex items-center justify-center p-6 main-gradient">
+    <div class="w-full max-w-lg space-y-8">
+        <div class="text-center space-y-2 animate__animated animate__fadeIn">
+            <h1 class="text-5xl font-extrabold tracking-tighter italic">SENTRY<span class="text-indigo-500 underline">INSIGHT</span></h1>
+            <p class="text-slate-500 font-medium text-xs uppercase tracking-[0.4em]">Advanced Profile Intelligence</p>
         </div>
-
-        <div id="errorBox" class="hidden animate__animated animate__headShake bg-red-500/10 border border-red-500/20 p-4 rounded-2xl text-red-400 text-xs text-center font-bold uppercase tracking-wider"></div>
-
-        <div id="loader" class="hidden text-center py-12 animate__animated animate__fadeIn">
-            <div class="inline-block w-10 h-10 border-[3px] border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-            <p class="text-[10px] mt-4 text-slate-500 uppercase font-black tracking-[0.3em]">Synchro Database...</p>
+        <div class="glass p-2.5 rounded-[30px] flex gap-3 shadow-2xl animate__animated animate__fadeInUp">
+            <input type="text" id="targetId" placeholder="ID Discord..." class="bg-transparent flex-1 px-6 outline-none font-bold text-lg placeholder-slate-700">
+            <button onclick="lookup()" class="btn-prime px-10 py-5 rounded-[22px] font-black text-[11px] uppercase tracking-widest">Analyser</button>
         </div>
-
-        <div id="card" class="hidden animate__animated animate__fadeInUp">
-            <div class="card-blur rounded-[32px] overflow-hidden shadow-2xl">
-                <div id="banner" class="h-36 w-full banner-img"></div>
-                
-                <div class="px-8 pb-8 flex flex-col items-center -mt-16 relative">
-                    <img id="avatar" src="" class="w-32 h-32 rounded-[35%] border-[6px] border-[#030407] shadow-2xl bg-slate-900">
-                    
-                    <div class="text-center mt-6">
-                        <h2 id="name" class="text-3xl font-black tracking-tight">---</h2>
-                        <p id="tag" class="text-indigo-400 font-bold text-sm opacity-80">@---</p>
+        <div id="loader" class="hidden flex flex-col items-center py-10 animate__animated animate__fadeIn">
+            <div class="w-12 h-12 border-[3px] border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-[9px] mt-6 text-indigo-400 font-black uppercase tracking-[0.5em]">Liaison satellite en cours</p>
+        </div>
+        <div id="card" class="hidden animate__animated animate__zoomIn">
+            <div class="glass rounded-[40px] overflow-hidden shadow-[0_40px_80px_-15px_rgba(0,0,0,0.7)]">
+                <div id="banner" class="h-44 w-full banner-glow bg-cover bg-center transition-all duration-1000"></div>
+                <div class="px-10 pb-10 flex flex-col items-center -mt-20 relative">
+                    <div class="relative group">
+                        <img id="avatar" src="" class="w-36 h-36 rounded-[45px] avatar-frame bg-slate-900 object-cover">
+                        <button onclick="dl('avatar')" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 rounded-[45px] flex items-center justify-center transition-all text-[10px] font-bold">SAVE</button>
                     </div>
-
-                    <div class="w-full space-y-3 mt-8">
-                        <div class="bg-white/[0.03] p-4 rounded-2xl border border-white/5 flex justify-between items-center">
-                            <span class="text-[10px] text-slate-500 font-black uppercase">Création</span>
-                            <span id="date" class="text-xs font-bold text-slate-200">---</span>
+                    <div class="text-center mt-8">
+                        <h2 id="name" class="text-4xl font-black tracking-tighter">---</h2>
+                        <p id="tag" class="text-indigo-400 font-extrabold text-sm mt-1">@---</p>
+                    </div>
+                    <div class="w-full grid grid-cols-1 gap-4 mt-10">
+                        <div class="stat-card flex justify-between items-center group">
+                            <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest">Date de création</span>
+                            <span id="date" class="text-sm font-bold text-indigo-100">---</span>
                         </div>
-                        <div class="bg-white/[0.03] p-4 rounded-2xl border border-white/5 flex justify-between items-center">
-                            <span class="text-[10px] text-slate-500 font-black uppercase">ID Stable</span>
-                            <span id="resId" class="text-[10px] font-mono text-indigo-300">---</span>
+                        <div class="stat-card flex justify-between items-center">
+                            <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest">ID Unique</span>
+                            <span id="resId" class="text-[11px] font-mono text-indigo-400">---</span>
                         </div>
                     </div>
-
-                    <div class="w-full grid grid-cols-1 gap-3 mt-8">
-                        <button onclick="downloadAsset('avatar')" class="w-full py-4 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-all">Télécharger Avatar</button>
-                        <button id="btnBanner" onclick="downloadAsset('banner')" class="w-full py-4 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-500/20 transition-all">Télécharger Bannière</button>
+                    <div class="w-full grid grid-cols-2 gap-4 mt-8">
+                        <button onclick="dl('avatar')" class="py-5 bg-white text-black rounded-3xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-50 transition-all">Avatar HD</button>
+                        <button id="btnB" onclick="dl('banner')" class="py-5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-3xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-500/20 transition-all">Bannière HD</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     <script>
-        let userData = null;
-
+        let uData = null;
         async function lookup() {
             const id = document.getElementById('targetId').value.trim();
-            const errBox = document.getElementById('errorBox');
-            const card = document.getElementById('card');
-            const loader = document.getElementById('loader');
-
-            // Reset
-            errBox.classList.add('hidden');
-            card.classList.add('hidden');
-
             if(!id) return;
-
-            loader.classList.remove('hidden');
-
+            document.getElementById('card').classList.add('hidden');
+            document.getElementById('loader').classList.remove('hidden');
             try {
-                const response = await fetch(`/api/user/${id}`);
-                const data = await response.json();
-
+                const res = await fetch(`/api/user/${id}`);
+                const data = await res.json();
                 if(data.success) {
-                    userData = data;
+                    uData = data;
                     document.getElementById('name').innerText = data.globalName;
                     document.getElementById('tag').innerText = `@${data.username}`;
                     document.getElementById('resId').innerText = data.id;
                     document.getElementById('date').innerText = data.createdAt;
                     document.getElementById('avatar').src = data.avatar;
-
-                    const banner = document.getElementById('banner');
-                    const btnBanner = document.getElementById('btnBanner');
-                    
+                    const b = document.getElementById('banner');
+                    const btnB = document.getElementById('btnB');
                     if(data.banner) {
-                        banner.style.backgroundImage = `url(${data.banner})`;
-                        btnBanner.style.display = "block";
+                        b.style.backgroundImage = `url(${data.banner})`;
+                        btnB.style.display = "block";
                     } else {
-                        banner.style.backgroundImage = 'none';
-                        banner.style.backgroundColor = data.bannerColor;
-                        btnBanner.style.display = "none";
+                        b.style.backgroundImage = 'none';
+                        b.style.backgroundColor = data.bannerColor;
+                        btnB.style.display = "none";
                     }
-
-                    // On attend que l'avatar charge pour éviter les flashs
                     document.getElementById('avatar').onload = () => {
-                        loader.classList.add('hidden');
-                        card.classList.remove('hidden');
+                        document.getElementById('loader').classList.add('hidden');
+                        document.getElementById('card').classList.remove('hidden');
                     };
                 } else {
-                    throw new Error(data.error);
+                    alert(data.error);
+                    document.getElementById('loader').classList.add('hidden');
                 }
             } catch (e) {
-                loader.classList.add('hidden');
-                errBox.innerText = "⚠️ " + e.message;
-                errBox.classList.remove('hidden');
+                alert("Erreur de connexion");
+                document.getElementById('loader').classList.add('hidden');
             }
         }
-
-        function downloadAsset(type) {
-            if(!userData) return;
-            const url = type === 'avatar' ? userData.avatar : userData.banner;
-            if(!url) return;
-            window.open(url, '_blank');
+        function dl(t) {
+            if(!uData) return;
+            const url = t === 'avatar' ? uData.avatar : uData.banner;
+            if(url) window.open(url, '_blank');
         }
     </script>
 </body>
