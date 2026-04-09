@@ -3,89 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Insight Pro</title>
+    <title>SENTRY // INSIGHT</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
-        body { background: #07080c; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; }
-        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .btn-main { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); transition: all 0.3s ease; }
-        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -10px #6366f1; }
-        .error-shake { animation: shake 0.5s; border-color: #ef4444 !important; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { background: #050609; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .premium-card { background: rgba(15, 17, 26, 0.7); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 32px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        .btn-grad { background: linear-gradient(135deg, #6366f1, #8b5cf6); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .btn-grad:hover { transform: scale(1.05); filter: brightness(1.2); }
+        .avatar-ring { border: 6px solid #050609; box-shadow: 0 0 20px rgba(0,0,0,0.4); }
+        .banner-overlay { background: linear-gradient(to bottom, transparent, rgba(5,6,9,0.8)); }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-900 to-black">
+<body class="min-h-screen flex items-center justify-center p-4">
 
-    <div class="w-full max-w-lg">
-        <div class="text-center mb-10 animate__animated animate__fadeIn">
-            <h1 class="text-4xl font-extrabold tracking-tight mb-2">Discord<span class="text-indigo-500">Insight</span></h1>
-            <p class="text-slate-400 font-medium text-sm italic">Outil d'analyse de profil temps réel</p>
+    <div class="w-full max-w-md space-y-6">
+        <div class="premium-card p-3 flex gap-2 animate__animated animate__fadeInDown">
+            <input type="text" id="targetId" placeholder="Entrez l'ID unique..." class="bg-transparent flex-1 px-4 outline-none font-semibold text-indigo-100">
+            <button onclick="lookup()" class="btn-grad px-6 py-3 rounded-2xl font-bold text-xs uppercase tracking-widest">Scanner</button>
         </div>
 
-        <div id="inputBox" class="glass-card p-2 rounded-2xl flex gap-2 mb-4 shadow-2xl transition-all">
-            <input type="text" id="targetId" placeholder="Coller l'ID (ex: 14877...)" class="bg-transparent flex-1 p-4 outline-none text-white font-semibold placeholder-slate-600">
-            <button onclick="lookup()" class="btn-main px-8 py-4 rounded-xl font-bold uppercase text-xs tracking-widest">Analyser</button>
-        </div>
-        <p id="errorMsg" class="text-red-400 text-xs ml-2 mb-8 hidden animate__animated animate__headShake">⚠️ Erreur détectée</p>
+        <div id="loader" class="hidden text-center py-10 animate-pulse text-indigo-400 font-bold uppercase tracking-widest text-[10px]">Initialisation du lien neural...</div>
 
-        <div id="loader" class="hidden text-center p-10">
-            <div class="inline-block w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-            <p class="text-xs mt-4 text-indigo-400 uppercase tracking-widest">Accès aux serveurs...</p>
-        </div>
-
-        <div id="card" class="hidden animate__animated animate__fadeInUp">
-            <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl">
-                <div id="banner" class="h-28 w-full transition-colors duration-1000"></div>
+        <div id="card" class="hidden animate__animated animate__zoomIn">
+            <div class="premium-card overflow-hidden">
+                <div id="bannerBox" class="h-40 w-full relative bg-indigo-600 bg-cover bg-center">
+                    <div class="absolute inset-0 banner-overlay"></div>
+                </div>
                 
-                <div class="px-8 pb-8 flex flex-col items-center">
-                    <div class="relative -mt-14 mb-4">
-                        <img id="avatar" src="" class="w-28 h-28 rounded-[2rem] border-[6px] border-[#07080c] bg-slate-800 shadow-2xl">
+                <div class="px-8 pb-8 flex flex-col items-center -mt-16 relative">
+                    <img id="avatar" src="" class="w-32 h-32 rounded-[2.5rem] avatar-ring bg-slate-800">
+                    
+                    <div class="text-center mt-6">
+                        <h2 id="name" class="text-3xl font-extrabold tracking-tight italic">---</h2>
+                        <p id="tag" class="text-indigo-400 font-bold text-sm">@---</p>
                     </div>
 
-                    <h2 id="name" class="text-2xl font-extrabold tracking-tight">---</h2>
-                    <p id="tag" class="text-indigo-400 font-bold text-xs mb-8">@---</p>
-
-                    <div class="w-full space-y-3 mb-8">
-                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5 flex justify-between items-center">
-                            <span class="text-slate-500 text-xs uppercase">Créé le</span>
-                            <span id="date" class="font-bold text-sm">---</span>
+                    <div class="w-full grid grid-cols-2 gap-3 mt-8">
+                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
+                            <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Ancienneté</p>
+                            <p id="date" class="text-sm font-semibold text-slate-200">---</p>
                         </div>
-                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5 flex justify-between items-center">
-                            <span class="text-slate-500 text-xs uppercase">ID Unique</span>
-                            <span id="resId" class="font-mono text-xs text-indigo-300">---</span>
+                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
+                            <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">ID Stable</p>
+                            <p id="resId" class="text-[10px] font-mono text-indigo-300 truncate">---</p>
                         </div>
                     </div>
 
-                    <a id="downloadBtn" href="#" download="avatar.png" class="w-full flex items-center justify-center gap-2 bg-white text-black font-extrabold py-4 rounded-2xl hover:bg-indigo-50 transition-all text-sm">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12 a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        TÉLÉCHARGER L'AVATAR
-                    </a>
+                    <div class="w-full space-y-3 mt-8">
+                        <button onclick="download('avatar')" class="w-full py-4 bg-white text-black rounded-2xl font-black text-xs flex items-center justify-center gap-2 hover:bg-indigo-50 transition-all uppercase">
+                            Télécharger Avatar
+                        </button>
+                        <button id="dlBanner" onclick="download('banner')" class="w-full py-4 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-2xl font-black text-xs flex items-center justify-center gap-2 hover:bg-indigo-500/20 transition-all uppercase">
+                            Télécharger Bannière
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        let currentData = null;
+
         async function lookup() {
-            const input = document.getElementById('targetId');
-            const box = document.getElementById('inputBox');
-            const err = document.getElementById('errorMsg');
-            const id = input.value.trim();
+            const id = document.getElementById('targetId').value.trim();
+            if(!id) return;
             
-            // Réinitialisation
-            err.classList.add('hidden');
-            box.classList.remove('error-shake');
-
-            // Vérifications locales
-            if(!id || !/^\d+$/.test(id) || id.length < 17) {
-                box.classList.add('error-shake');
-                err.innerText = !id ? "⚠️ L'ID est vide !" : "⚠️ ID invalide (chiffres uniquement, 17+ caractères).";
-                err.classList.remove('hidden');
-                return;
-            }
-
             document.getElementById('card').classList.add('hidden');
             document.getElementById('loader').classList.remove('hidden');
 
@@ -94,27 +79,53 @@
                 const data = await response.json();
 
                 if(data.success) {
+                    currentData = data;
                     document.getElementById('name').innerText = data.globalName;
-                    document.getElementById('tag').innerText = `@${data.username}${data.tag}`;
+                    document.getElementById('tag').innerText = `@${data.username}`;
                     document.getElementById('resId').innerText = data.id;
                     document.getElementById('date').innerText = data.createdAt;
-                    document.getElementById('avatar').src = data.avatar;
-                    document.getElementById('banner').style.backgroundColor = data.bannerColor;
-                    document.getElementById('downloadBtn').href = data.avatar;
                     
-                    document.getElementById('loader').classList.add('hidden');
-                    document.getElementById('card').classList.remove('hidden');
+                    // Gestion Avatar
+                    document.getElementById('avatar').src = data.avatar;
+                    
+                    // Gestion Bannière
+                    const bannerBox = document.getElementById('bannerBox');
+                    if(data.banner) {
+                        bannerBox.style.backgroundImage = `url(${data.banner})`;
+                        document.getElementById('dlBanner').classList.remove('opacity-50', 'pointer-events-none');
+                    } else {
+                        bannerBox.style.backgroundImage = 'none';
+                        bannerBox.style.backgroundColor = data.bannerColor;
+                        document.getElementById('dlBanner').classList.add('opacity-50', 'pointer-events-none');
+                    }
+
+                    // On attend que l'image soit chargée pour afficher (évite le bug du 2ème clic)
+                    document.getElementById('avatar').onload = () => {
+                        document.getElementById('loader').classList.add('hidden');
+                        document.getElementById('card').classList.remove('hidden');
+                    };
                 } else {
-                    box.classList.add('error-shake');
-                    err.innerText = "⚠️ " + data.error;
-                    err.classList.remove('hidden');
+                    alert("Utilisateur introuvable");
                     document.getElementById('loader').classList.add('hidden');
                 }
             } catch (e) {
-                err.innerText = "⚠️ Erreur de connexion au serveur.";
-                err.classList.remove('hidden');
+                alert("Erreur Serveur");
                 document.getElementById('loader').classList.add('hidden');
             }
+        }
+
+        function download(type) {
+            if(!currentData) return;
+            const url = type === 'avatar' ? currentData.avatar : currentData.banner;
+            if(!url) return;
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.target = '_blank'; // Sur mobile, ça ouvre l'image pour l'enregistrer
+            link.download = `${type}-${currentData.id}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     </script>
 </body>
