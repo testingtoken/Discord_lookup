@@ -3,48 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SENTRY // PROTOTYPE</title>
+    <title>SENTRY // LOOKUP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&display=swap');
         body { background: #02040a; color: #fff; font-family: 'Space Grotesk', sans-serif; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .neon-border { border-left: 4px solid #06b6d4; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-6">
     <div class="w-full max-w-md space-y-8">
         <div class="text-center">
-            <h1 class="text-3xl font-bold tracking-tighter uppercase italic">Sentry_Lookup</h1>
-            <p class="text-slate-500 text-xs mt-2 uppercase tracking-widest">Accès en temps réel</p>
+            <h1 class="text-3xl font-bold tracking-tighter uppercase italic text-cyan-500">Sentry_Lookup</h1>
+            <p class="text-slate-500 text-[10px] uppercase tracking-[0.2em]">Accès Base de Données Discord</p>
         </div>
+
         <div class="glass p-2 rounded-2xl flex gap-2">
-            <input type="text" id="targetId" placeholder="ID UTILISATEUR..." class="bg-transparent flex-1 p-3 outline-none text-sm font-mono">
+            <input type="text" id="targetId" placeholder="ID UTILISATEUR..." class="bg-transparent flex-1 p-3 outline-none text-sm font-mono text-cyan-100">
             <button onclick="lookup()" class="bg-cyan-600 hover:bg-cyan-500 text-black font-bold px-6 py-2 rounded-xl text-xs uppercase transition-all">Scan</button>
         </div>
-        <div id="loader" class="hidden text-center text-cyan-500 text-xs animate-pulse">RECHERCHE...</div>
-        <div id="card" class="hidden glass rounded-3xl overflow-hidden">
+
+        <div id="loader" class="hidden text-center text-cyan-500 text-[10px] animate-pulse">CRYPTOGRAPHIE EN COURS...</div>
+
+        <div id="card" class="hidden glass rounded-3xl overflow-hidden border-cyan-900/30 shadow-[0_0_50px_-12px_rgba(6,182,212,0.2)]">
             <div class="h-20 bg-gradient-to-r from-cyan-950 to-blue-950"></div>
             <div class="p-6 pt-0 -mt-10 flex flex-col items-center">
-                <img id="avatar" src="" class="w-24 h-24 rounded-2xl border-4 border-[#02040a] bg-slate-900 shadow-2xl">
-                <h2 id="name" class="text-xl font-bold mt-4">---</h2>
+                <img id="avatar" src="" class="w-24 h-24 rounded-2xl border-4 border-[#02040a] bg-slate-900">
+                <h2 id="name" class="text-xl font-bold mt-4 tracking-tight">---</h2>
                 <p id="tag" class="text-slate-500 text-sm">@---</p>
-                <div class="w-full mt-6 space-y-3">
-                    <div class="bg-white/5 p-3 rounded-xl border border-white/5">
-                        <span class="text-[10px] text-slate-500 block uppercase">ID</span>
-                        <span id="resId" class="text-xs font-mono text-cyan-400">---</span>
-                    </div>
+                <div class="w-full mt-6 bg-white/5 p-3 rounded-xl border border-white/5">
+                    <span class="text-[10px] text-slate-500 block uppercase">Identifiant</span>
+                    <span id="resId" class="text-xs font-mono text-cyan-400">---</span>
                 </div>
             </div>
         </div>
     </div>
+
     <script>
         async function lookup() {
             const id = document.getElementById('targetId').value;
             if(!id) return;
             document.getElementById('loader').classList.remove('hidden');
             try {
-                const response = await fetch(`https://discord-lookup-oqhd.onrender.com/api/user/${id}`);
+                const response = await fetch(`/api/user/${id}`);
                 const data = await response.json();
                 if(data.success) {
                     document.getElementById('name').innerText = data.globalName;
@@ -52,8 +53,8 @@
                     document.getElementById('resId').innerText = data.id;
                     document.getElementById('avatar').src = data.avatar;
                     document.getElementById('card').classList.remove('hidden');
-                } else { alert("Introuvable"); }
-            } catch (e) { alert("Erreur serveur"); }
+                } else { alert("Utilisateur inconnu."); }
+            } catch (e) { alert("Erreur de liaison."); }
             document.getElementById('loader').classList.add('hidden');
         }
     </script>
