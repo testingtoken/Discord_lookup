@@ -15,30 +15,29 @@ app.get('/', (req, res) => {
 
 app.get('/api/user/:id', async (req, res) => {
     const id = req.params.id;
-    
-    // Sécurité : Vérifie si l'ID est valide (uniquement chiffres, bonne longueur)
-    if (!/^\d+$/.test(id) || id.length < 17 || id.length > 20) {
-        return res.json({ success: false, error: "Format d'ID invalide (chiffres uniquement)." });
-    }
+    if (!/^\d+$/.test(id) || id.length < 17) return res.json({ success: false, error: "ID invalide" });
 
     try {
+        // Force le fetch pour avoir TOUTES les données (bannière incluse)
         const user = await client.users.fetch(id, { force: true });
+        
         res.json({
             success: true,
+            id: user.id,
             username: user.username,
             globalName: user.globalName || user.username,
             avatar: user.displayAvatarURL({ dynamic: true, size: 1024 }),
+            // Récupère l'image de bannière OU la couleur
+            banner: user.bannerURL({ dynamic: true, size: 1024 }) || null,
             bannerColor: user.hexAccentColor || '#5865F2',
-            createdAt: user.createdAt.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }),
-            tag: user.discriminator !== '0' ? `#${user.discriminator}` : ''
+            createdAt: user.createdAt.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
         });
     } catch (e) { 
-        res.json({ success: false, error: "Cet utilisateur n'existe pas." }); 
+        res.json({ success: false, error: "Utilisateur introuvable" }); 
     }
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Serveur actif sur le port ${PORT}`);
-    client.login(process.env.DISCORD_TOKEN).catch(() => console.log("Erreur : Token invalide"));
+    client.login(process.env.DISCORD_TOKEN).catch(() => console.log("Token Error"));
 });
