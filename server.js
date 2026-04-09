@@ -1,19 +1,23 @@
 const express = require('express');
 const { Client, GatewayIntentBits } = require('discord.js');
 const cors = require('cors');
+const path = require('path'); // AJOUTÉ
 
 const app = express();
 app.use(cors());
 
-const client = new Client({ 
-    intents: [GatewayIntentBits.Guilds] 
+// --- AJOUT POUR AFFICHER LE SITE ---
+app.use(express.static(path.join(__dirname))); 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
+// -----------------------------------
 
-// Récupère le token via les variables d'environnement de Render
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 const TOKEN = process.env.DISCORD_TOKEN;
 
 client.once('ready', () => {
-    console.log(`✅ Bot connecté en tant que : ${client.user.tag}`);
+    console.log(`✅ Bot connecté : ${client.user.tag}`);
 });
 
 app.get('/api/user/:id', async (req, res) => {
@@ -27,15 +31,10 @@ app.get('/api/user/:id', async (req, res) => {
             id: user.id
         });
     } catch (error) {
-        console.error(error);
         res.status(404).json({ success: false, message: "Utilisateur introuvable" });
     }
 });
 
-// Route de test pour voir si le serveur vit
-app.get('/', (req, res) => res.send("Système SENTRY en ligne."));
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Serveur actif sur le port ${PORT}`));
-
 client.login(TOKEN);
