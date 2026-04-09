@@ -3,83 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SENTRY // Intelligence</title>
+    <title>SENTRY // PROTOTYPE</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            background: #050508;
-            color: #fff;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            overflow-x: hidden;
-        }
-        .glass {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .glow-cyan { box-shadow: 0 0 30px rgba(6, 182, 212, 0.15); }
-        .input-cyber {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .input-cyber:focus {
-            border-color: #06b6d4;
-            background: rgba(6, 182, 212, 0.05);
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap');
+        body { background: #02040a; color: #fff; font-family: 'Space Grotesk', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .neon-border { border-left: 4px solid #06b6d4; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-start py-12 px-4">
+<body class="min-h-screen flex flex-col items-center justify-center p-6">
 
-    <div class="w-full max-w-lg mb-12 text-center">
-        <h1 class="text-xs uppercase tracking-[0.5em] text-cyan-500 font-bold mb-2 animate-pulse">Neural Link Active</h1>
-        <h2 class="text-4xl font-extrabold tracking-tight">SENTRY<span class="text-cyan-500">.</span>OS</h2>
-    </div>
+    <div class="w-full max-w-md space-y-8">
+        <div class="text-center">
+            <h1 class="text-3xl font-bold tracking-tighter uppercase italic">Sentry_Lookup</h1>
+            <p class="text-slate-500 text-xs mt-2 uppercase tracking-widest">Accès aux serveurs Discord en temps réel</p>
+        </div>
 
-    <div class="w-full max-w-lg relative group mb-12">
-        <input type="text" id="targetId" placeholder="Entrez un ID Discord..." 
-            class="input-cyber w-full p-6 rounded-3xl outline-none text-lg font-light tracking-wide">
-        <button onclick="searchUser()" class="absolute right-3 top-3 bottom-3 bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-8 rounded-2xl transition-all active:scale-95 shadow-lg shadow-cyan-500/20">
-            SCAN
-        </button>
-    </div>
+        <div class="glass p-2 rounded-2xl flex gap-2">
+            <input type="text" id="targetId" placeholder="ID UTILISATEUR..." 
+                class="bg-transparent flex-1 p-3 outline-none text-sm font-mono">
+            <button onclick="lookup()" class="bg-cyan-600 hover:bg-cyan-500 text-black font-bold px-6 py-2 rounded-xl text-xs uppercase transition-all">
+                Scan
+            </button>
+        </div>
 
-    <div id="resultCard" class="hidden w-full max-w-lg space-y-6">
-        <div class="glass rounded-[2.5rem] overflow-hidden glow-cyan">
-            <div id="banner" class="h-32 bg-gradient-to-r from-cyan-900 to-blue-900 opacity-50"></div>
-            
-            <div class="px-8 pb-10">
-                <div class="flex items-end -mt-14 gap-6 mb-8">
-                    <img id="avatar" src="" class="w-32 h-32 rounded-[2rem] border-[8px] border-[#050508] shadow-2xl bg-gray-900">
-                    <div class="mb-2">
-                        <h3 id="username" class="text-3xl font-bold tracking-tighter">---</h3>
-                        <p id="globalName" class="text-cyan-500/80 font-medium">@---</p>
+        <div id="loader" class="hidden text-center text-cyan-500 text-xs animate-pulse">RECHERCHE DANS LA BASE...</div>
+
+        <div id="card" class="hidden glass rounded-3xl overflow-hidden animate-in fade-in duration-500">
+            <div class="h-20 bg-gradient-to-r from-cyan-950 to-blue-950"></div>
+            <div class="p-6 pt-0 -mt-10 flex flex-col items-center">
+                <img id="avatar" src="" class="w-24 h-24 rounded-2xl border-4 border-[#02040a] bg-slate-900 shadow-2xl">
+                <h2 id="name" class="text-xl font-bold mt-4">---</h2>
+                <p id="tag" class="text-slate-500 text-sm">@---</p>
+                
+                <div class="w-full mt-6 space-y-3">
+                    <div class="bg-white/5 p-3 rounded-xl border border-white/5">
+                        <span class="text-[10px] text-slate-500 block uppercase">Identifiant Unique</span>
+                        <span id="resId" class="text-xs font-mono text-cyan-400">---</span>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 text-sm font-light">
-                    <div class="p-4 rounded-2xl bg-white/5 border border-white/5">
-                        <p class="text-gray-500 text-[10px] uppercase mb-1">Status</p>
-                        <p class="text-emerald-400 font-bold uppercase tracking-widest text-[10px]">Identifié</p>
-                    </div>
-                    <div class="p-4 rounded-2xl bg-white/5 border border-white/5">
-                        <p class="text-gray-500 text-[10px] uppercase mb-1">Database ID</p>
-                        <p id="displayId" class="font-mono text-xs">---</p>
-                    </div>
-                </div>
-
-                <div class="mt-8 pt-8 border-t border-white/5">
-                    <h4 class="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-6 font-bold">Rapports d'archive</h4>
-                    <div id="logs" class="space-y-4 mb-6">
-                        <p class="text-gray-600 text-xs italic">Aucun rapport disponible.</p>
-                    </div>
-                    
-                    <div class="flex gap-3">
-                        <input id="logInput" type="text" placeholder="Ajouter une note de terrain..." 
-                            class="bg-white/5 border border-white/5 flex-1 rounded-xl p-3 text-sm outline-none focus:border-cyan-500/50 transition-all">
-                        <button onclick="addLog()" class="bg-white/10 hover:bg-white/20 px-4 rounded-xl text-xs font-bold uppercase">Log</button>
+                <div class="w-full mt-6 pt-6 border-t border-white/10">
+                    <p class="text-[10px] text-slate-500 mb-4 uppercase">Notes de terrain</p>
+                    <div id="logs" class="space-y-2 mb-4"></div>
+                    <div class="flex gap-2">
+                        <input id="logIn" type="text" placeholder="Note..." class="bg-white/5 border border-white/10 flex-1 rounded-lg p-2 text-xs outline-none">
+                        <button onclick="addLog()" class="bg-white/10 p-2 rounded-lg text-xs">OK</button>
                     </div>
                 </div>
             </div>
@@ -87,43 +57,46 @@
     </div>
 
     <script>
-        async function searchUser() {
+        async function lookup() {
             const id = document.getElementById('targetId').value;
+            const card = document.getElementById('card');
+            const loader = document.getElementById('loader');
+            
             if(!id) return;
-
-            // Change cet URL par celui de ton serveur Render plus tard !
-            const apiURL = `http://localhost:3000/api/user/${id}`;
+            
+            loader.classList.remove('hidden');
+            card.classList.add('hidden');
 
             try {
-                const res = await fetch(apiURL);
-                const data = await res.json();
+                // REMPLACE L'URL CI-DESSOUS PAR TON LIEN RENDER
+                const response = await fetch(`https://discord-lookup-oqhd.onrender.com/api/user/${id}`);
+                const data = await response.json();
 
                 if(data.success) {
-                    document.getElementById('resultCard').classList.remove('hidden');
-                    document.getElementById('username').innerText = data.username;
-                    document.getElementById('globalName').innerText = `@${data.username}`;
-                    document.getElementById('displayId').innerText = data.id;
+                    document.getElementById('name').innerText = data.globalName;
+                    document.getElementById('tag').innerText = `@${data.username}`;
+                    document.getElementById('resId').innerText = data.id;
                     document.getElementById('avatar').src = data.avatar;
-                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                    card.classList.remove('hidden');
                 } else {
                     alert("Cible introuvable.");
                 }
             } catch (e) {
-                alert("Erreur de connexion au serveur.");
+                alert("Erreur serveur. Vérifie que Render est 'Live'.");
+            } finally {
+                loader.classList.add('hidden');
             }
         }
 
         function addLog() {
-            const input = document.getElementById('logInput');
-            if(!input.value) return;
+            const val = document.getElementById('logIn').value;
+            if(!val) return;
             const logs = document.getElementById('logs');
-            if(logs.querySelector('p')) logs.innerHTML = '';
-            
-            const div = document.createElement('div');
-            div.className = "p-4 rounded-2xl bg-cyan-500/5 border border-cyan-500/10 text-xs text-cyan-100 animate-in slide-in-from-left-2";
-            div.innerHTML = `<span class="text-cyan-500 font-bold tracking-tighter mr-2">LOG_${Math.floor(Math.random()*999)}:</span> ${input.value}`;
-            logs.prepend(div);
-            input.value = '';
+            const d = document.createElement('div');
+            d.className = "neon-border bg-white/5 p-2 text-[11px] text-slate-300";
+            d.innerText = val;
+            logs.prepend(d);
+            document.getElementById('logIn').value = "";
         }
     </script>
 </body>
