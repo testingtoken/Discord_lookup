@@ -3,65 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Insight</title>
+    <title>Discord Insight Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
-        body { background: #0a0c10; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
-        .bg-gradient { background: radial-gradient(circle at 50% 50%, #1e293b 0%, #020617 100%); }
-        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .btn-gradient { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); transition: all 0.3s ease; }
-        .btn-gradient:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -10px #6366f1; }
-        .shimmer { position: relative; overflow: hidden; }
-        .shimmer::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); animation: shimmer 3s infinite; }
-        @keyframes shimmer { 100% { left: 200%; } }
+        body { background: #07080c; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .btn-main { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); transition: all 0.3s ease; }
+        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -10px #6366f1; }
+        .error-shake { animation: shake 0.5s; border-color: #ef4444 !important; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center bg-gradient p-4">
+<body class="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-900 to-black">
 
     <div class="w-full max-w-lg">
         <div class="text-center mb-10 animate__animated animate__fadeIn">
-            <h1 class="text-4xl font-extrabold tracking-tight mb-2">Discord<span class="text-indigo-500 underline">Insight</span></h1>
-            <p class="text-slate-400 font-medium">Analyse instantanée des profils</p>
+            <h1 class="text-4xl font-extrabold tracking-tight mb-2">Discord<span class="text-indigo-500">Insight</span></h1>
+            <p class="text-slate-400 font-medium text-sm italic">Outil d'analyse de profil temps réel</p>
         </div>
 
-        <div class="glass-card p-2 rounded-2xl flex gap-2 mb-8 shadow-2xl">
-            <input type="text" id="targetId" placeholder="Coller l'ID Discord ici..." class="bg-transparent flex-1 p-4 outline-none text-white font-semibold">
-            <button onclick="lookup()" class="btn-gradient px-8 py-4 rounded-xl font-bold uppercase text-xs tracking-widest">Analyser</button>
+        <div id="inputBox" class="glass-card p-2 rounded-2xl flex gap-2 mb-4 shadow-2xl transition-all">
+            <input type="text" id="targetId" placeholder="Coller l'ID (ex: 14877...)" class="bg-transparent flex-1 p-4 outline-none text-white font-semibold placeholder-slate-600">
+            <button onclick="lookup()" class="btn-main px-8 py-4 rounded-xl font-bold uppercase text-xs tracking-widest">Analyser</button>
         </div>
+        <p id="errorMsg" class="text-red-400 text-xs ml-2 mb-8 hidden animate__animated animate__headShake">⚠️ Erreur détectée</p>
 
-        <div id="loader" class="hidden text-center p-10"><div class="inline-block w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div></div>
+        <div id="loader" class="hidden text-center p-10">
+            <div class="inline-block w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-xs mt-4 text-indigo-400 uppercase tracking-widest">Accès aux serveurs...</p>
+        </div>
 
         <div id="card" class="hidden animate__animated animate__fadeInUp">
-            <div class="glass-card rounded-[2rem] overflow-hidden shadow-2xl shimmer">
-                <div id="banner" class="h-32 w-full transition-colors duration-1000"></div>
+            <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl">
+                <div id="banner" class="h-28 w-full transition-colors duration-1000"></div>
                 
                 <div class="px-8 pb-8 flex flex-col items-center">
-                    <div class="relative -mt-16 mb-4">
-                        <img id="avatar" src="" class="w-32 h-32 rounded-[2.5rem] border-[6px] border-[#0a0c10] bg-slate-800 shadow-xl">
+                    <div class="relative -mt-14 mb-4">
+                        <img id="avatar" src="" class="w-28 h-28 rounded-[2rem] border-[6px] border-[#07080c] bg-slate-800 shadow-2xl">
                     </div>
 
-                    <h2 id="name" class="text-3xl font-extrabold tracking-tight">---</h2>
-                    <p id="tag" class="text-indigo-400 font-bold text-sm mb-6">@---</p>
+                    <h2 id="name" class="text-2xl font-extrabold tracking-tight">---</h2>
+                    <p id="tag" class="text-indigo-400 font-bold text-xs mb-8">@---</p>
 
-                    <div class="w-full grid grid-cols-2 gap-3 mb-6 text-sm">
-                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                            <span class="text-slate-500 block mb-1">Création du compte</span>
-                            <span id="date" class="font-bold">---</span>
+                    <div class="w-full space-y-3 mb-8">
+                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5 flex justify-between items-center">
+                            <span class="text-slate-500 text-xs uppercase">Créé le</span>
+                            <span id="date" class="font-bold text-sm">---</span>
                         </div>
-                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                            <span class="text-slate-500 block mb-1">ID Utilisateur</span>
-                            <span id="resId" class="font-mono text-xs opacity-70">---</span>
+                        <div class="bg-white/5 p-4 rounded-2xl border border-white/5 flex justify-between items-center">
+                            <span class="text-slate-500 text-xs uppercase">ID Unique</span>
+                            <span id="resId" class="font-mono text-xs text-indigo-300">---</span>
                         </div>
                     </div>
 
-                    <div class="w-full grid grid-cols-1 gap-3">
-                        <a id="downloadBtn" href="#" download="avatar.png" class="flex items-center justify-center gap-2 bg-white text-black font-bold py-4 rounded-2xl hover:bg-indigo-50 transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12 a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                            Télécharger l'avatar
-                        </a>
-                    </div>
+                    <a id="downloadBtn" href="#" download="avatar.png" class="w-full flex items-center justify-center gap-2 bg-white text-black font-extrabold py-4 rounded-2xl hover:bg-indigo-50 transition-all text-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12 a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        TÉLÉCHARGER L'AVATAR
+                    </a>
                 </div>
             </div>
         </div>
@@ -69,9 +69,23 @@
 
     <script>
         async function lookup() {
-            const id = document.getElementById('targetId').value;
-            if(!id) return;
+            const input = document.getElementById('targetId');
+            const box = document.getElementById('inputBox');
+            const err = document.getElementById('errorMsg');
+            const id = input.value.trim();
             
+            // Réinitialisation
+            err.classList.add('hidden');
+            box.classList.remove('error-shake');
+
+            // Vérifications locales
+            if(!id || !/^\d+$/.test(id) || id.length < 17) {
+                box.classList.add('error-shake');
+                err.innerText = !id ? "⚠️ L'ID est vide !" : "⚠️ ID invalide (chiffres uniquement, 17+ caractères).";
+                err.classList.remove('hidden');
+                return;
+            }
+
             document.getElementById('card').classList.add('hidden');
             document.getElementById('loader').classList.remove('hidden');
 
@@ -91,11 +105,14 @@
                     document.getElementById('loader').classList.add('hidden');
                     document.getElementById('card').classList.remove('hidden');
                 } else {
-                    alert("Utilisateur introuvable !");
+                    box.classList.add('error-shake');
+                    err.innerText = "⚠️ " + data.error;
+                    err.classList.remove('hidden');
                     document.getElementById('loader').classList.add('hidden');
                 }
             } catch (e) {
-                alert("Erreur serveur.");
+                err.innerText = "⚠️ Erreur de connexion au serveur.";
+                err.classList.remove('hidden');
                 document.getElementById('loader').classList.add('hidden');
             }
         }
